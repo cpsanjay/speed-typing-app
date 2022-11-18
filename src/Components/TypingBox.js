@@ -2,6 +2,7 @@ import React, { createRef, useEffect, useMemo, useRef, useState } from "react";
 import { useTestMode } from "../Context/TestModes";
 import UpperMenu from "./UpperMenu";
 import randomWords from "random-words";
+import Stats from "./Stats";
 
 const TypingBox = () => {
   const [currentWordSpan, setCurrentWordSpan] = useState(0);
@@ -10,6 +11,9 @@ const TypingBox = () => {
   const [testStart, setTestStart] = useState(false);
   const [testOver, setTestOver] = useState(false);
   const [intervalId, setIntevalId] = useState(null);
+  const [correctChars, setCorrectChars] = useState(0);
+  const [correctWords, setCorrectWords] = useState(0);
+  const [graphData, setGraphData] = useState([]);
   const [wordsArray, setWordsArray] = useState(() => {
     return randomWords(100);
   });
@@ -62,6 +66,14 @@ const TypingBox = () => {
     }
   };
 
+  const calculateWPM = () => {
+    return Math.round(correctChars / 5 / (testTime / 60));
+  };
+
+  const calculateAccuracy = () => {
+    return Math.round((correctWords / currentWordSpan) * 100);
+  };
+
   const resetTest = () => {
     setCurrentLetterSpan(0);
     setCurrentWordSpan(0);
@@ -85,6 +97,11 @@ const TypingBox = () => {
 
     // logic for space
     if (e.keyCode === 32) {
+      const correctChar =
+        wordSpanRef[currentWordSpan].current.querySelectorAll(".correct");
+      if (correctChar.length === allChildrenNodes.length) {
+        setCorrectWords(correctWords + 1);
+      }
       if (allChildrenNodes.length <= currentLetterSpan) {
         allChildrenNodes[currentLetterSpan - 1].classList.remove("right");
       } else {
@@ -133,9 +150,10 @@ const TypingBox = () => {
       return;
     }
 
-    // logic for word
+    // logic for correct and incorrect
     if (allChildrenNodes[currentLetterSpan].innerText === e.key) {
       allChildrenNodes[currentLetterSpan].className = "char correct";
+      setCorrectChars(correctChars + 1);
     } else {
       allChildrenNodes[currentLetterSpan].className = "char incorrect";
     }
@@ -157,7 +175,7 @@ const TypingBox = () => {
       <UpperMenu countDown={countDown} />
 
       {testOver ? (
-        <h1>Time's Up</h1>
+        <Stats wpm={calculateWPM()} accuracy={calculateAccuracy()} />
       ) : (
         <div className="type-box">
           <div className="words">
