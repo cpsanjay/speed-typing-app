@@ -14,6 +14,7 @@ body {
     padding: 0;
     margin: 0;
     transition: all 0.25s linear;
+    font-family: 'Roboto Mono', monospace;
 }
 
 .canvas {
@@ -30,11 +31,11 @@ body {
     max-width: 1000px;
     margin: 0 auto;
     overflow: hidden;
-    height: 140px;
+    height: 130px;
 }
 
 .words {
-    font-size: 30px;
+    font-size: 24px;
     flex-wrap: wrap;
     display: flex;
     align-content: center;
@@ -45,6 +46,10 @@ body {
 .word {
     margin: 5px;
 
+}
+
+.char {
+    padding: 0.035rem;
 }
 
 .hidden-input {
@@ -103,6 +108,10 @@ body {
     cursor: none;
 }
 
+.time {
+    transition: color 0.15s linear;
+}
+
 .time:hover {
     color:  ${({ theme }) => theme.title};
     cursor: pointer;
@@ -142,7 +151,14 @@ body {
     margin-right: auto;
     margin-left: auto;
     justify-content: space-between;
-    height: 60px;   
+    height: 60px;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Lexend Deca', sans-serif;
+    font-weight: 400;
+    font-size: 30px;
 }
 
 
