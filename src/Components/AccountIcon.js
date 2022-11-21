@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import LogoutIcon from "@mui/icons-material/Logout";
 
@@ -10,21 +9,31 @@ import SignupForm from "./SignupForm";
 import { auth } from "../firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
+import { useAlert } from "../Context/AlertContext";
+import GoogleButton from "react-google-button";
+import { Box } from "@mui/system";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { useTheme } from "../Context/ThemeContext";
 
 const useStyles = makeStyles(() => ({
   modal: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    backdropFilter: "blur(2px)",
   },
   box: {
     width: 400,
+    textAlign: "center",
+    border: "2px solid",
   },
 }));
 
 const AccountIcon = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
+  const { setAlert } = useAlert();
+  const { theme } = useTheme();
 
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
@@ -45,7 +54,35 @@ const AccountIcon = () => {
   };
 
   const logout = () => {
-    auth.signOut().then((ok) => alert("logged out"));
+    auth.signOut().then((ok) => {
+      setAlert({
+        open: true,
+        type: "success",
+        message: "Logged out",
+      });
+    });
+  };
+
+  const googleProvider = new GoogleAuthProvider();
+
+  const signInWithGoogle = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((res) => {
+        setAlert({
+          open: true,
+          type: "success",
+          message: "Logged in",
+        });
+        handleClose();
+      })
+      .catch((err) => {
+        console.log(err);
+        setAlert({
+          open: true,
+          type: "error",
+          message: "not able to use google authentication",
+        });
+      });
   };
 
   const classes = useStyles();
@@ -64,16 +101,23 @@ const AccountIcon = () => {
             >
               <Tab
                 label="login"
-                style={{ color: "white", backgroundColor: "black" }}
+                style={{ color: theme.title, backgroundColor: "black" }}
               ></Tab>
               <Tab
                 label="signup"
-                style={{ color: "white", backgroundColor: "black" }}
+                style={{ color: theme.title, backgroundColor: "black" }}
               ></Tab>
             </Tabs>
           </AppBar>
           {value === 0 && <LoginForm handleClose={handleClose} />}
           {value === 1 && <SignupForm handleClose={handleClose} />}
+          <Box>
+            <span style={{ display: "block", padding: "1rem" }}>OR</span>
+            <GoogleButton
+              style={{ width: "100%" }}
+              onClick={signInWithGoogle}
+            />
+          </Box>
         </div>
       </Modal>
     </div>
