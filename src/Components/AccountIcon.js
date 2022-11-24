@@ -36,6 +36,7 @@ const AccountIcon = () => {
   const { theme } = useTheme();
 
   const [user] = useAuthState(auth);
+
   const navigate = useNavigate();
   const handleClose = () => {
     setOpen(false);

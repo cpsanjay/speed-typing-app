@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Graph from "./Graph";
+import { auth, db } from "../firebaseConfig";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useAlert } from "../Context/AlertContext";
 
 const Stats = ({
   wpm,
@@ -18,6 +21,50 @@ const Stats = ({
       return i;
     }
   });
+
+  const [user] = useAuthState(auth);
+  const { setAlert } = useAlert();
+
+  const pushDataToDB = async () => {
+    const resultsRef = db.collection("Results");
+    const { uid } = auth.currentUser;
+    console.log(uid);
+
+    if (!isNaN(accuracy)) {
+      await resultsRef
+        .add({
+          userId: uid,
+          wpm: wpm,
+          accuracy: accuracy,
+          characters: `${correctChars}/${incorrectChars}/${missedChars}/${extraChars}`,
+        })
+        .then((res) =>
+          setAlert({
+            open: true,
+            type: "success",
+            message: "results are stored",
+          })
+        );
+    } else {
+      setAlert({
+        open: true,
+        type: "error",
+        message: "Invalid test",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      pushDataToDB();
+    } else {
+      setAlert({
+        open: true,
+        type: "warning",
+        message: "Login to save results",
+      });
+    }
+  }, []);
 
   return (
     <div className="stats-box">
