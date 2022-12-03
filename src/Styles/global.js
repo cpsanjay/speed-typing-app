@@ -18,6 +18,10 @@ body {
     overflow-y: scroll;
 }
 
+a {
+    color: ${({ theme }) => theme.title}
+}
+
 body::-webkit-scrollbar {
     display: none;
 }
@@ -185,6 +189,11 @@ body::-webkit-scrollbar {
     display: flex;
     justify-content: space-between;
     width: 1000px;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
 }
 
 .logo {

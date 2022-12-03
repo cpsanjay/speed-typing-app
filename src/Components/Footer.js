@@ -18,7 +18,13 @@ const Footer = () => {
         </div>
       </div>
       <div className="actual-footer">
-        <div className="footer-links">Links</div>
+        <div className="footer-links">
+          <a href="https://www.linkedin.com/in/sanjay-cp/" target="_blank">
+            LinkedIn
+          </a>
+          <a href="https://github.com/cpsanjay">Github</a>
+          <a href="https://sanjaycp-portfolio.netlify.app/">Portfolio</a>
+        </div>
         <div className="theme-options">
           <Select
             options={themeOptions}

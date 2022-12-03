@@ -286,7 +286,9 @@ const TypingBox = () => {
 
   return (
     <div>
-      <UpperMenu countDown={countDown} currentWordSpan={currentWordSpan} />
+      {!testOver && (
+        <UpperMenu countDown={countDown} currentWordSpan={currentWordSpan} />
+      )}
 
       {testOver ? (
         <Stats
