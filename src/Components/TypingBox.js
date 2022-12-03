@@ -4,11 +4,19 @@ import UpperMenu from "./UpperMenu";
 import randomWords from "random-words";
 import Stats from "./Stats";
 import { auth } from "../firebaseConfig";
+import { Dialog, DialogTitle } from "@mui/material";
 
 const TypingBox = () => {
+  const { testTime, testMode, testWords } = useTestMode();
   const [currentWordSpan, setCurrentWordSpan] = useState(0);
   const [currentLetterSpan, setCurrentLetterSpan] = useState(0);
-  const [countDown, setCountDown] = useState(15);
+  const [countDown, setCountDown] = useState(() => {
+    if (testMode === "time") {
+      return 180;
+    } else {
+      return testTime;
+    }
+  });
   const [testStart, setTestStart] = useState(false);
   const [testOver, setTestOver] = useState(false);
   const [intervalId, setIntevalId] = useState(null);
@@ -18,7 +26,11 @@ const TypingBox = () => {
   const [extraChars, setExtraChars] = useState(0);
   const [missedChars, setMissedChars] = useState(0);
   const [graphData, setGraphData] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
   const [wordsArray, setWordsArray] = useState(() => {
+    if (testMode === "words") {
+      return randomWords(testWords);
+    }
     return randomWords(100);
   });
 
@@ -32,6 +44,49 @@ const TypingBox = () => {
       .map((i) => createRef(null));
   }, [words]);
 
+  const focusInput = () => {
+    inputRef.current.focus();
+  };
+
+  const handleDialogEvents = (e) => {
+    // keydown logic of dialogue box
+    if (e.keyCode === 32) {
+      e.preventDefault();
+      redo();
+      setOpenDialog(false);
+      return;
+    }
+    // logic for tab/enter
+    if (e.keyCode === 9 || e.keyCode === 13) {
+      e.preventDefault();
+      resetTest();
+      setOpenDialog(false);
+    }
+    e.preventDefault();
+    setOpenDialog(false);
+    startTimer();
+  };
+
+  const redo = () => {
+    setCurrentLetterSpan(0);
+    setCurrentWordSpan(0);
+    setTestOver(false);
+    setTestStart(false);
+    clearInterval(intervalId);
+    setCountDown(testTime);
+    focusInput();
+    if (testMode === "words") {
+      setCountDown(180);
+    }
+    setGraphData([]);
+    setCorrectChars(0);
+    setIncorrectChars(0);
+    setCorrectWords(0);
+    setMissedChars(0);
+    setExtraChars(0);
+    resetWordSpanClassName();
+  };
+
   const resetWordSpanClassName = () => {
     wordSpanRef.map((i) => {
       Array.from(i.current.childNodes).map((j) => {
@@ -41,8 +96,6 @@ const TypingBox = () => {
     wordSpanRef[0].current.childNodes[0].className = "char current";
   };
 
-  const { testTime } = useTestMode();
-
   useEffect(() => {
     focusInput();
     wordSpanRef[0].current.childNodes[0].className = "char current";
@@ -51,7 +104,8 @@ const TypingBox = () => {
 
   useEffect(() => {
     resetTest();
-  }, [testTime]);
+    focusInput();
+  }, [testTime, testMode, testWords]);
 
   const startTimer = () => {
     const intervalId = setInterval(timer, 1000);
@@ -59,16 +113,15 @@ const TypingBox = () => {
 
     function timer() {
       setCountDown((prevCountDown) => {
-        console.log(prevCountDown);
         setCorrectChars((correctChars) => {
-          console.log(correctChars);
           setGraphData((data) => {
+            const startTime = testMode === "words" ? 180 : testTime;
             return [
               ...data,
               [
-                testTime - prevCountDown,
+                startTime - prevCountDown,
                 Math.round(
-                  correctChars / 5 / ((testTime - prevCountDown + 1) / 60)
+                  correctChars / 5 / ((startTime - prevCountDown + 1) / 60)
                 ),
               ],
             ];
@@ -88,7 +141,9 @@ const TypingBox = () => {
   };
 
   const calculateWPM = () => {
-    return Math.round(correctChars / 5 / (testTime / 60));
+    return Math.round(
+      correctChars / 5 / ((graphData[graphData.length - 1][0] + 1) / 60)
+    );
   };
 
   const calculateAccuracy = () => {
@@ -103,13 +158,33 @@ const TypingBox = () => {
     clearInterval(intervalId);
     setCountDown(testTime);
     focusInput();
-    let random = randomWords(100);
-    setWordsArray(random);
-
+    if (testMode === "words") {
+      let random = randomWords(testWords);
+      setWordsArray(random);
+      setCountDown(180);
+    } else {
+      let random = randomWords(100);
+      setWordsArray(random);
+    }
+    setGraphData([]);
+    setCorrectChars(0);
+    setIncorrectChars(0);
+    setCorrectWords(0);
+    setMissedChars(0);
+    setExtraChars(0);
     resetWordSpanClassName();
   };
 
   const handleKeyPress = (e) => {
+    if (e.keyCode === 9) {
+      if (testStart) {
+        clearInterval(intervalId);
+      }
+      e.preventDefault();
+      setOpenDialog(true);
+      return;
+    }
+
     if (!testStart) {
       startTimer();
       setTestStart(true);
@@ -118,6 +193,11 @@ const TypingBox = () => {
 
     // logic for space
     if (e.keyCode === 32) {
+      if (currentWordSpan === wordsArray.length - 1) {
+        clearInterval(intervalId);
+        setTestOver(true);
+        return;
+      }
       const correctChar =
         wordSpanRef[currentWordSpan].current.querySelectorAll(".correct");
       const incorrectChar =
@@ -135,10 +215,18 @@ const TypingBox = () => {
       } else {
         allChildrenNodes[currentLetterSpan].classList.remove("current");
       }
-      // add cursor to the next word
 
+      // add cursor to the next word
       wordSpanRef[currentWordSpan + 1].current.childNodes[0].className =
         "char current";
+
+      if (
+        currentWordSpan !== 0 &&
+        wordSpanRef[currentWordSpan + 1].current.offsetLeft <
+          wordSpanRef[currentWordSpan].current.offsetLeft
+      ) {
+        wordSpanRef[currentWordSpan].current.scrollIntoView();
+      }
       setCurrentWordSpan(currentWordSpan + 1);
       setCurrentLetterSpan(0);
 
@@ -196,13 +284,9 @@ const TypingBox = () => {
     setCurrentLetterSpan(currentLetterSpan + 1);
   };
 
-  const focusInput = () => {
-    inputRef.current.focus();
-  };
-
   return (
     <div>
-      <UpperMenu countDown={countDown} />
+      <UpperMenu countDown={countDown} currentWordSpan={currentWordSpan} />
 
       {testOver ? (
         <Stats
@@ -213,6 +297,7 @@ const TypingBox = () => {
           incorrectChars={incorrectChars}
           missedChars={missedChars}
           extraChars={extraChars}
+          resetTest={resetTest}
         />
       ) : (
         <div className="type-box">
@@ -236,6 +321,26 @@ const TypingBox = () => {
         onKeyDown={(e) => handleKeyPress(e)}
         ref={inputRef}
       />
+
+      <Dialog
+        PaperProps={{
+          style: {
+            background: "transparent",
+            boxShadow: "none",
+          },
+        }}
+        open={openDialog}
+        onKeyDown={handleDialogEvents}
+        style={{
+          backdropFilter: "blur(2px)",
+        }}
+      >
+        <DialogTitle>
+          <div className="instructions">press Space to redo</div>
+          <div className="instructions">press Tab/Enter to restart</div>
+          <div className="instructions">press any other key to exit</div>
+        </DialogTitle>
+      </Dialog>
     </div>
   );
 };

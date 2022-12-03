@@ -19,7 +19,7 @@ const AlertComponent = () => {
     <div>
       <Snackbar
         open={alert.open}
-        autoHideDuration={3000}
+        autoHideDuration={300}
         anchorOrigin={{
           vertical: "top",
           horizontal: "right",

@@ -3,6 +3,7 @@ import Graph from "./Graph";
 import { auth, db } from "../firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useAlert } from "../Context/AlertContext";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const Stats = ({
   wpm,
@@ -12,6 +13,7 @@ const Stats = ({
   missedChars,
   incorrectChars,
   extraChars,
+  resetTest,
 }) => {
   let timeSet = new Set();
 
@@ -28,7 +30,6 @@ const Stats = ({
   const pushDataToDB = async () => {
     const resultsRef = db.collection("Results");
     const { uid } = auth.currentUser;
-    console.log(uid);
 
     if (!isNaN(accuracy)) {
       await resultsRef
@@ -37,6 +38,7 @@ const Stats = ({
           wpm: wpm,
           accuracy: accuracy,
           characters: `${correctChars}/${incorrectChars}/${missedChars}/${extraChars}`,
+          timeStamp: new Date(),
         })
         .then((res) =>
           setAlert({
@@ -69,15 +71,18 @@ const Stats = ({
   return (
     <div className="stats-box">
       <div className="stats-left">
-        <div className="title">WPM</div>
-        <div className="subtitles">{wpm}</div>
-        <div className="title">Accuracy</div>
-        <div className="subtitles">{accuracy}</div>
+        <div className="stats">
+          <div className="title">WPM</div>
+          <div className="subtitles">{wpm}</div>
+          <div className="title">Accuracy</div>
+          <div className="subtitles">{accuracy}</div>
 
-        <div className="title">Characters</div>
-        <div className="subtitles">
-          {correctChars}/{incorrectChars}/{missedChars}/{extraChars}
+          <div className="title">Characters</div>
+          <div className="subtitles">
+            {correctChars}/{incorrectChars}/{missedChars}/{extraChars}
+          </div>
         </div>
+        <RestartAltIcon className="reset-button" onClick={resetTest} />
       </div>
       <div className="stats-right">
         <Graph graphData={newGraph} />

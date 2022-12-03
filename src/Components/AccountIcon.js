@@ -6,7 +6,7 @@ import { AppBar, Modal, Tab, Tabs } from "@mui/material";
 import { makeStyles } from "@material-ui/styles";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../Context/AlertContext";
@@ -68,13 +68,22 @@ const AccountIcon = () => {
 
   const signInWithGoogle = () => {
     signInWithPopup(auth, googleProvider)
-      .then((res) => {
-        setAlert({
-          open: true,
-          type: "success",
-          message: "Logged in",
-        });
-        handleClose();
+      .then(async (res) => {
+        const username = res.user.email.split("@")[0];
+        const ref = await db
+          .collection("username")
+          .doc(username)
+          .set({
+            uid: res.user.uid,
+          })
+          .then((response) => {
+            setAlert({
+              open: true,
+              type: "success",
+              message: "Logged in",
+            });
+            handleClose();
+          });
       })
       .catch((err) => {
         console.log(err);

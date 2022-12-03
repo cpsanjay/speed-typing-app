@@ -12,24 +12,31 @@ const Footer = () => {
 
   return (
     <div className="footer">
-      <div className="footer-links">Links</div>
-      <div className="theme-options">
-        <Select
-          options={themeOptions}
-          menuPlacement="top"
-          onChange={(e) => handleThemeChange(e)}
-          defaultValue={{ value: defaultTheme, label: defaultTheme.label }}
-          styles={{
-            control: (styles) => ({
-              ...styles,
-              backgroundColor: theme.backgroundColor,
-            }),
-            menu: (styles) => ({
-              ...styles,
-              backgroundColor: theme.backgroundColor,
-            }),
-          }}
-        />
+      <div className="instructions">
+        <div className="hints">
+          Press <kbd>Tab</kbd> to open commands
+        </div>
+      </div>
+      <div className="actual-footer">
+        <div className="footer-links">Links</div>
+        <div className="theme-options">
+          <Select
+            options={themeOptions}
+            menuPlacement="top"
+            onChange={(e) => handleThemeChange(e)}
+            defaultValue={{ value: defaultTheme, label: defaultTheme.label }}
+            styles={{
+              control: (styles) => ({
+                ...styles,
+                backgroundColor: theme.backgroundColor,
+              }),
+              menu: (styles) => ({
+                ...styles,
+                backgroundColor: theme.backgroundColor,
+              }),
+            }}
+          />
+        </div>
       </div>
     </div>
   );

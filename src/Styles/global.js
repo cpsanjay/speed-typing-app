@@ -15,6 +15,11 @@ body {
     margin: 0;
     transition: all 0.25s linear;
     font-family: 'Roboto Mono', monospace;
+    overflow-y: scroll;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
 
 .canvas {
@@ -40,7 +45,7 @@ body {
     display: flex;
     align-content: center;
     width: 100%;
-    color: ${({ theme }) => theme.typeBox};
+    color: ${({ theme }) => theme.title};
 }
 
 .word {
@@ -49,7 +54,7 @@ body {
 }
 
 .char {
-    padding: 0.035rem;
+    padding: 0.030rem;
 }
 
 .hidden-input {
@@ -57,7 +62,8 @@ body {
 }
 
 .correct {
-    color: ${({ theme }) => theme.title};
+    color: ${({ theme }) => theme.typeBox};
+    // color: red;
 }
 
 .incorrect {
@@ -96,24 +102,30 @@ body {
     max-width: 1000px;
     justify-content: space-between;
     font-size: 20px;
-    color:  ${({ theme }) => theme.typeBox};
+    color:  ${({ theme }) => theme.title};
 }
 
-.time-modes {
+.time-modes, .word-modes {
     display: flex;
     gap: 10px;
 }
 
 .counter {
     cursor: none;
+    color: ${({ theme }) => theme.stats}
 }
 
-.time {
+.time, .no-of-words {
     transition: color 0.15s linear;
 }
 
-.time:hover {
-    color:  ${({ theme }) => theme.title};
+.time:hover, .no-of-words:hover {
+    color:  ${({ theme }) => theme.stats};
+    cursor: pointer;
+}
+
+.mode:hover {
+    color: ${({ theme }) => theme.stats};
     cursor: pointer;
 }
 
@@ -127,12 +139,13 @@ body {
 
 .title {
     font-size: 20px;
-    color:  ${({ theme }) => theme.typeBox};
+    color:  ${({ theme }) => theme.title};
 }
 
 .subtitles {
     font-size: 30px;
-    color:  ${({ theme }) => theme.title};
+    font-weight: 600;
+    color:  ${({ theme }) => theme.stats};
 }
 
 .stats-left {
@@ -145,22 +158,130 @@ body {
     width: 70%;
 }
 
-.footer, .header {
-    display: flex;
+.header {
+     display: flex;
     width: 1000px;
     margin-right: auto;
     margin-left: auto;
     justify-content: space-between;
-    height: 60px;
     align-items: center;
+    height: 60px;
+
+}
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    width: 1000px;
+    margin-right: auto;
+    margin-left: auto;
+    // justify-content: space-between;
+    align-items: center;
+    height: 60px;
+
+}
+
+.actual-footer {
+    display: flex;
+    justify-content: space-between;
+    width: 1000px;
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-span {
     font-family: 'Lexend Deca', sans-serif;
     font-weight: 400;
     font-size: 30px;
+
+}
+
+.hints {
+    kbd {
+        background-color: ${({ theme }) => theme.title};
+        color: ${({ theme }) => theme.background};
+        padding: 2.5px 5px;
+        border-radius: 5px;
+    }
+}
+
+.result-graph, .table {
+    width: 1000px;
+    margin: auto;
+}
+
+.user-profile {
+    width: 1000px;
+    margin: auto;
+    display: flex;
+    min-height: 15rem;
+    background-color: ${({ theme }) => theme.typeBox};
+    border-radius: 20px;
+}
+
+.user {
+    display: flex;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 1rem;
+    border-right: 2px solid;
+}
+
+.picture {
+    width: 50%;
+}
+
+.info {
+    width: 50%;
+    margin-top: 1rem;
+    // font-size: 1.5rem;
+    text-align: right;
+}
+
+.total-items {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.center-screen {
+    display: flex;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.instructions {
+    color: ${({ theme }) => theme.title};
+}
+
+.reset-button {
+    transform: scale(2);
+    margin-top: 3rem;
+    cursor: pointer;
 }
 
 
+.compare-page {
+    margin: auto;
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.compare-name {
+    font-size: 24px;
+}
 
 `;
